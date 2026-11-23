@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JARVIS — Asistente personal V6</title>
+<style>
+:root{--bg:#100b06;--panel:#1b130b;--orange:#ffad45;--orange2:#ff7b19;--orangeSoft:#ffbd70;--text:#fff1df;--muted:#c29b73;--line:#68401e;--glow:rgba(255,151,40,.28)}
+*{box-sizing:border-box}body{margin:0;color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100vh;background:radial-gradient(ellipse at 50% 15%,#42240c 0,#241509 24%,#100b06 62%,#080604 100%);overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.17;background:linear-gradient(transparent 49%,rgba(255,171,75,.08) 50%,transparent 51%);background-size:100% 5px;z-index:0}
+header{padding:20px 18px 8px;text-align:center;position:relative;z-index:2}header h1{margin:0;letter-spacing:3px;font-size:clamp(28px,7vw,42px);color:#ff9b30;-webkit-text-stroke:.7px #b85b12;text-shadow:0 0 5px #ff9c30,0 0 18px #ff821c65}header p{color:#b98b5a;margin:5px 0 0;font-size:12px;letter-spacing:2px}
+main{max-width:760px;margin:auto;padding:8px 14px 28px;position:relative;z-index:1}.topbar{display:flex;justify-content:flex-end;max-width:760px;margin:0 auto;padding:0 14px;position:relative;z-index:5}.menu-toggle,.send-btn,.mic-btn,.menu-action{border:1px solid #8a4b1b;background:linear-gradient(145deg,#42240e,#241508);color:#ffbd70;border-radius:12px;padding:10px 13px;font-weight:650;cursor:pointer;box-shadow:0 0 12px #ff8d1c14}.menu-toggle{font-size:20px;padding:7px 12px;min-width:45px}.menu-toggle:active,button:active{transform:scale(.97)}
+.drawer{position:absolute;right:14px;top:48px;width:min(260px,calc(100vw - 36px));background:#1c1209f5;border:1px solid #a25c24;border-radius:16px;padding:10px;box-shadow:0 14px 40px #0009;display:none;z-index:10;backdrop-filter:blur(12px)}.drawer.open{display:flex;flex-direction:column;gap:8px}.drawer-title{color:#ffb35b;font-size:12px;letter-spacing:2px;padding:6px 8px}.menu-action{text-align:left;width:100%;background:#29190b;border-color:#623916;padding:11px}.menu-action.active{background:#5b3211;border-color:#ffae4d}
+.status{font-size:12px;color:#c79a69;text-align:center;margin:0 0 12px;letter-spacing:1px}.orb-wrap{display:flex;justify-content:center;align-items:center;padding:0 0 8px;position:relative;min-height:255px}.orb{width:min(250px,68vw);aspect-ratio:1;position:relative;filter:drop-shadow(0 0 16px #ff9b3035);transition:filter .4s,transform .4s}.orb svg{width:100%;height:100%;overflow:visible}.ring{transform-origin:150px 150px;animation:spin 22s linear infinite}.ring.reverse{animation-direction:reverse;animation-duration:17s}.ring.fast{animation-duration:8s}.core-pulse{transform-origin:150px 150px;animation:corePulse 3s ease-in-out infinite}.particles{animation:float 6s ease-in-out infinite alternate}.scan{animation:scan 4s linear infinite}.orb.listening{filter:drop-shadow(0 0 28px #ffb14c88);transform:scale(1.05)}.orb.listening .ring{animation-duration:5s}.orb.thinking{filter:drop-shadow(0 0 24px #ff7a1888)}.orb.thinking .ring{animation-duration:3s}.orb.speaking{filter:drop-shadow(0 0 30px #ffd18b99)}.orb.speaking .core-pulse{animation-duration:.55s}.orb.speaking .ring{animation-duration:7s}
+@keyframes spin{to{transform:rotate(360deg)}}@keyframes corePulse{0%,100%{transform:scale(.98);opacity:.9}50%{transform:scale(1.05);opacity:1}}@keyframes float{0%{transform:translateY(-3px);opacity:.6}100%{transform:translateY(4px);opacity:1}}@keyframes scan{0%{transform:rotate(0);opacity:.15}50%{opacity:.55}100%{transform:rotate(360deg);opacity:.15}}
+.panel{background:linear-gradient(160deg,#21160cf0,#140d07f2);border:1px solid #70441f;border-radius:20px;padding:14px;box-shadow:0 12px 40px #0005,0 0 18px #ff9c2510}.chat{height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:4px 2px 12px}.msg{padding:11px 13px;border-radius:14px;max-width:88%;line-height:1.45;font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere}.jarvis{align-self:flex-start;background:#2a1a0b;border:1px solid #72461e}.user{align-self:flex-end;background:#49270c;border:1px solid #9a551d}.msg small{display:block;color:#ffb866;font-size:10px;margin-bottom:4px;letter-spacing:1.5px}.msg a{color:#ffc17c}.listen-reply{margin-top:8px;padding:7px 10px;font-size:12px;border-radius:9px;background:#29180a;border:1px solid #74441b;color:#ffbd70}
+.controls{display:flex;gap:7px;margin-top:12px;align-items:stretch}.input-wrap{flex:1;min-width:0;display:flex;gap:6px;background:#120b06;border:1px solid #74441c;border-radius:14px;padding:5px}.input-wrap input{flex:1;min-width:0;background:transparent;border:0;outline:0;color:var(--text);padding:9px;font-size:15px}.input-wrap input::placeholder{color:#b58a5f}.mic-btn{padding:8px 11px;min-width:44px;font-size:18px;background:linear-gradient(145deg,#713d12,#3a210b);border-color:#a25e25}.send-btn{min-width:64px;background:linear-gradient(145deg,#9b5618,#5a310d);border-color:#b87530}.note{color:#99744f;font-size:11px;text-align:center;margin:12px 4px 0}.toast{font-size:12px;color:#d8ad7d;text-align:center;margin-top:7px;min-height:15px}
+@media(max-width:390px){.orb-wrap{min-height:220px}.orb{width:215px}.chat{height:270px}.controls{gap:5px}.send-btn{min-width:54px;padding:9px}}
+
+/* Corrección de compatibilidad visual V5 */
+html,body{background-color:#080604!important;color:#fff1df!important}
+body{background-image:radial-gradient(ellipse at 50% 15%,#42240c 0,#241509 24%,#100b06 62%,#080604 100%)!important}
+header,main{position:relative;z-index:2}
+.topbar{position:relative;z-index:1000}
+button,input{font:inherit}
+/* Menu V5: solid, high-layer overlay so the hologram cannot show through */
+.drawer{position:fixed!important;top:calc(env(safe-area-inset-top, 0px) + 120px)!important;right:14px!important;left:auto!important;width:min(300px,calc(100vw - 28px))!important;max-height:55vh;overflow-y:auto;background:#1b1008!important;background-image:linear-gradient(160deg,#241509,#130b05)!important;border:1px solid #a25c24!important;border-radius:16px!important;padding:12px!important;box-shadow:0 18px 50px rgba(0,0,0,.92),0 0 24px rgba(255,150,35,.18)!important;backdrop-filter:none!important;opacity:1!important;z-index:99999!important;display:none!important}
+.drawer.open{display:flex!important;flex-direction:column;gap:8px}
+.drawer-title{background:#1b1008;color:#ffb35b!important}
+.menu-action{background:#29190b!important;color:#ffbd70!important;border-color:#75451c!important}
+.ui-icon{width:20px;height:20px;display:inline-block;vertical-align:middle;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}.menu-toggle,.menu-action,.listen-reply,.mic-btn{display:inline-flex;align-items:center;justify-content:center;gap:9px}.menu-action{justify-content:flex-start}.menu-toggle .ui-icon{width:22px;height:22px}.listen-reply{gap:7px}.mic-btn .ui-icon{width:23px;height:23px}.menu-action .ui-icon{width:19px;height:19px}.menu-action span,.listen-reply span{line-height:1.2} 
+/* V6: núcleo reactivo y microinteracciones */
+body:after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(circle at 50% 47%,rgba(255,144,30,.08),transparent 34%),linear-gradient(90deg,transparent 49.8%,rgba(255,170,70,.025) 50%,transparent 50.2%);animation:ambient 8s ease-in-out infinite alternate}
+header h1{animation:titleGlow 4s ease-in-out infinite}
+.orb{will-change:transform,filter}.orb:after{content:"";position:absolute;inset:5%;border:1px solid rgba(255,180,85,.12);border-radius:50%;box-shadow:inset 0 0 28px rgba(255,140,25,.08);pointer-events:none;animation:halo 5s ease-in-out infinite}
+.orb.listening:after{inset:-5%;border-color:rgba(255,190,95,.42);box-shadow:0 0 28px rgba(255,153,40,.2),inset 0 0 32px rgba(255,153,40,.12);animation:haloListen 1.1s ease-in-out infinite}
+.orb.thinking:after{inset:0;border-color:rgba(255,125,30,.32);animation:haloThink 1.8s linear infinite}
+.orb.speaking:after{inset:-2%;border-color:rgba(255,220,150,.42);animation:haloSpeak .65s ease-in-out infinite}
+.status{transition:color .25s,text-shadow .25s;min-height:18px}.status:empty{display:none}
+.menu-toggle,.send-btn,.mic-btn,.menu-action,.listen-reply{transition:transform .16s ease,box-shadow .25s,border-color .25s,background .25s}.menu-toggle:hover,.send-btn:hover,.mic-btn:hover,.menu-action:hover,.listen-reply:hover{box-shadow:0 0 18px rgba(255,151,40,.18);border-color:#d98b42}
+.menu-action.active{box-shadow:inset 0 0 18px rgba(255,160,50,.12),0 0 10px rgba(255,160,50,.1)}
+.jarvis{animation:messageIn .22s ease-out}.user{animation:messageIn .18s ease-out}
+@keyframes ambient{from{opacity:.65}to{opacity:1}}@keyframes titleGlow{0%,100%{text-shadow:0 0 5px #ff9c30,0 0 18px #ff821c45}50%{text-shadow:0 0 9px #ffbd62,0 0 26px #ff821c70}}
+@keyframes halo{0%,100%{transform:scale(.98);opacity:.45}50%{transform:scale(1.025);opacity:.85}}@keyframes haloListen{0%,100%{transform:scale(.96);opacity:.45}50%{transform:scale(1.06);opacity:1}}@keyframes haloThink{to{transform:rotate(360deg)}}@keyframes haloSpeak{0%,100%{transform:scale(.98);opacity:.5}50%{transform:scale(1.04);opacity:1}}@keyframes messageIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+</style>
+</head>
+<body>
+<header><h1>JARVIS</h1><p>JUST A RATHER VERY INTELLIGENT SYSTEM</p></header>
+<div class="topbar"><button class="menu-toggle" id="menuToggle" aria-label="Abrir menú"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><div class="drawer" id="drawer"><div class="drawer-title">PANEL DE SISTEMA</div><button class="menu-action" id="auto"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="M16 9.5a3 3 0 0 1 0 5M18.5 7a6.5 6.5 0 0 1 0 10"/></svg><span>Voz automática: apagada</span></button><button class="menu-action" id="stop"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/></svg><span>Detener voz</span></button><button class="menu-action" id="clear"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m3 0-1 13H7L6 7m4 4v6m4-6v6"/></svg><span>Limpiar conversación</span></button><button class="menu-action" id="notesMenu"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v13H9l-4 3V4Z"/><path d="M8 8h8M8 11h8M8 14h5"/></svg><span>Mis notas</span></button><button class="menu-action" id="about"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 10.5v5M12 7.5h.01"/></svg><span>Acerca de JARVIS</span></button></div></div>
+<main>
+<div class="orb-wrap"><div class="orb" id="orb" aria-label="Núcleo holográfico JARVIS"><svg viewBox="0 0 300 300" role="img" aria-label="Esfera holográfica naranja animada">
+<defs><radialGradient id="core" cx="35%" cy="30%"><stop offset="0" stop-color="#ffe5a8"/><stop offset=".24" stop-color="#ffbd62"/><stop offset=".58" stop-color="#f58a22"/><stop offset="1" stop-color="#6c2d08"/></radialGradient><radialGradient id="haze"><stop offset="0" stop-color="#ffb84d" stop-opacity=".4"/><stop offset="1" stop-color="#ff8c21" stop-opacity="0"/></radialGradient></defs>
+<circle cx="150" cy="150" r="136" fill="url(#haze)"/>
+<g class="ring" fill="none" stroke="#ffb24e" stroke-opacity=".55"><ellipse cx="150" cy="150" rx="127" ry="42" stroke-width="1.2"/><ellipse cx="150" cy="150" rx="120" ry="60" stroke-width=".7" transform="rotate(38 150 150)"/><ellipse cx="150" cy="150" rx="119" ry="56" stroke-width=".8" transform="rotate(-35 150 150)"/><circle cx="150" cy="150" r="126" stroke-dasharray="2 9"/></g>
+<g class="ring reverse" fill="none" stroke="#ff8d24" stroke-opacity=".8"><ellipse cx="150" cy="150" rx="105" ry="26" stroke-width="2"/><ellipse cx="150" cy="150" rx="91" ry="76" stroke-width="1.1" transform="rotate(68 150 150)"/><circle cx="150" cy="150" r="88" stroke-dasharray="24 7 3 8" stroke-width="2"/></g>
+<g class="ring fast" fill="none" stroke="#ffd28b" stroke-opacity=".65"><circle cx="150" cy="150" r="70" stroke-dasharray="4 8 22 8" stroke-width="1.5"/><ellipse cx="150" cy="150" rx="80" ry="16" transform="rotate(-22 150 150)"/><path d="M40 150h28m164 0h28M150 40v28m0 164v28" stroke-width="1.4"/></g>
+<g class="core-pulse"><circle cx="150" cy="150" r="57" fill="url(#core)" stroke="#ffd08a" stroke-width="1.5"/><circle cx="150" cy="150" r="43" fill="none" stroke="#ffedc5" stroke-opacity=".65" stroke-width="1"/><circle cx="150" cy="150" r="31" fill="none" stroke="#ffcf80" stroke-opacity=".8" stroke-dasharray="3 5"/><path d="M150 96v108M96 150h108M112 112l76 76M188 112l-76 76" stroke="#ffedc5" stroke-opacity=".26" stroke-width="1"/></g>
+<g class="particles" fill="#ffd38b"><circle cx="60" cy="90" r="2.2"/><circle cx="233" cy="76" r="1.7"/><circle cx="224" cy="208" r="2.4"/><circle cx="79" cy="218" r="1.5"/><circle cx="150" cy="22" r="2"/><circle cx="150" cy="278" r="1.8"/><circle cx="28" cy="150" r="1.5"/><circle cx="272" cy="150" r="2"/><circle cx="104" cy="46" r="1.6"/><circle cx="194" cy="253" r="1.4"/></g>
+<g class="scan" fill="none" stroke="#ffe0a5" stroke-opacity=".35"><path d="M150 18a132 132 0 0 1 132 132" stroke-width="1.2"/><path d="M150 28a122 122 0 0 1 122 122" stroke-width=".5"/></g>
+</svg></div></div>
+<div class="panel"><p class="status" id="status">SISTEMAS EN LÍNEA · A SUS ÓRDENES, SEÑOR</p><div class="chat" id="chat" aria-live="polite"></div>
+<div class="controls"><div class="input-wrap"><input id="input" placeholder="Escriba un comando, señor…" autocomplete="off"><button class="mic-btn" id="mic" title="Hablar" aria-label="Hablar"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21m-4 0h8"/></svg></button></div><button class="send-btn" id="send">Enviar</button></div><div class="toast" id="toast"></div></div>
+<p class="note">Las notas se guardan localmente en este navegador. La voz y el micrófono dependen de Chrome.</p>
+</main>
+<script>
+const chat=document.getElementById('chat'),input=document.getElementById('input'),statusEl=document.getElementById('status');
+let autoVoice=false,recognition=null, listening=false, timerId=null; const orb=document.getElementById('orb'),drawer=document.getElementById('drawer'),toast=document.getElementById('toast'); function setOrbState(state){orb.classList.remove('listening','thinking','speaking');if(state)orb.classList.add(state)}
+function addMessage(text,who='jarvis',speakIt=false,html=false){
+ const d=document.createElement('div');d.className='msg '+(who==='user'?'user':'jarvis');
+ if(who==='jarvis'){const small=document.createElement('small');small.textContent='J.A.R.V.I.S.';d.appendChild(small)}
+ const body=document.createElement('div');if(html)body.innerHTML=text;else body.textContent=text;d.appendChild(body);
+ if(who==='jarvis'&&!speakIt){const b=document.createElement('button');b.innerHTML="<svg class=\"ui-icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M4 9v6h4l5 4V5L8 9H4Z\"/><path d=\"M16 9.5a3 3 0 0 1 0 5M18.5 7a6.5 6.5 0 0 1 0 10\"/></svg>"+'<span>Escuchar</span>';b.className='listen-reply';b.onclick=()=>speak(text.replace(/<[^>]*>/g,' '));d.appendChild(b)}
+ chat.appendChild(d);chat.scrollTop=chat.scrollHeight;
+ if(who==='jarvis'&&speakIt)speak(text.replace(/<[^>]*>/g,' '));
+}
+function speak(t){if(!('speechSynthesis'in window)){statusEl.textContent='La voz no está disponible en este navegador, señor.';return}speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(t);u.lang='es-CO';u.rate=.90;u.pitch=.74;u.onstart=()=>setOrbState('speaking');u.onend=()=>setOrbState('');u.onerror=()=>setOrbState('');speechSynthesis.speak(u)}
+function say(t){setOrbState('thinking');addMessage(t,'jarvis',autoVoice);if(!autoVoice)setTimeout(()=>setOrbState(''),900)}
+function getNotes(){try{return JSON.parse(localStorage.getItem('jarvis_notes')||'[]')}catch{return []}}
+function saveNotes(n){localStorage.setItem('jarvis_notes',JSON.stringify(n))}
+function timeText(){return new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'})}
+function dateText(){return new Date().toLocaleDateString('es-CO',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}
+function normalize(s){return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim()}
+function safeCalc(expr){
+ const cleaned=expr.replace(/,/g,'.').replace(/[x×]/g,'*').replace(/[÷]/g,'/').replace(/[^0-9+\-*/().% ]/g,'');
+ if(!cleaned||! /^[0-9+\-*/().% ]+$/.test(cleaned))return null;
+ try{const result=Function('"use strict";return ('+cleaned+')')();return Number.isFinite(result)?result:null}catch{return null}
+}
+function processCommand(raw){
+ const original=raw.trim(),s=normalize(original);
+ if(!s)return;
+ addMessage(original,'user');
+ if(/^(hola|buenos dias|buenas tardes|buenas noches|hey|saludos)/.test(s))return say('Buenos días, señor. Sistemas en línea. ¿En qué puedo asistirle?');
+ if(s.includes('ayuda')||s.includes('que puedes hacer')||s.includes('comandos')){
+  return say('A sus órdenes, señor. Puedo: decir la hora y la fecha; hacer cálculos; guardar, consultar o borrar notas; contar un chiste; abrir enlaces como Google o YouTube; y activar un temporizador. Pruebe decir: “qué hora es”, “calcula 25 por 4”, “recuerda que…”, “mis notas”, “temporizador de 1 minuto” o “abre YouTube”.');
+ }
+ if(s.includes('hora'))return say('Son las '+timeText()+', señor.');
+ if(s.includes('fecha')||s.includes('dia es hoy'))return say('Hoy es '+dateText()+', señor.');
+ if(s.startsWith('calcula ')||s.startsWith('cuanto es ')||s.startsWith('cuánto es ')||s.startsWith('resuelve ')){
+  let expr=original.replace(/^(calcula|cuanto es|cuánto es|resuelve)\s*/i,'').replace(/por/gi,'*').replace(/mas/gi,'+').replace(/menos/gi,'-').replace(/entre/gi,'/');
+  const n=safeCalc(expr);return say(n===null?'No pude interpretar esa operación, señor. Intente escribirla con números y signos.':'El resultado es '+n+', señor.');
+ }
+ if(s.includes('recuerda que')||s.startsWith('anota ')||s.startsWith('guarda una nota')){
+  let note=original.replace(/^(recuerda que|anota|guarda una nota)\s*/i,'').trim();
+  if(!note)return say('¿Qué desea que anote, señor?');
+  let notes=getNotes();notes.push({text:note,date:new Date().toLocaleString('es-CO')});saveNotes(notes);
+  return say('Anotado, señor. Guardaré esa nota en este navegador.');
+ }
+ if(s.includes('mis notas')||s.includes('lee mis notas')||s.includes('mostrar notas')){
+  const notes=getNotes();if(!notes.length)return say('No hay notas guardadas, señor.');
+  return say('Estas son sus notas, señor:\n'+notes.map((n,i)=>(i+1)+'. '+n.text).join('\n'));
+ }
+ if(s.includes('borra mis notas')||s.includes('elimina mis notas')||s.includes('borrar notas')){
+  saveNotes([]);return say('He borrado las notas guardadas en este navegador, señor.');
+ }
+ if(s.includes('chiste')||s.includes('hazme reir')||s.includes('cuenta algo gracioso')){
+  const jokes=['¿Por qué el libro de matemáticas estaba triste? Porque tenía demasiados problemas, señor.','¿Qué hace una computadora cuando tiene frío? Cierra Windows, señor.','¿Por qué el robot fue al médico? Porque tenía un virus, señor.'];
+  return say(jokes[Math.floor(Math.random()*jokes.length)]);
+ }
+ if(s.includes('temporizador')||s.includes('timer')||s.includes('cuenta regresiva')){
+  const m=original.match(/(\d+)\s*(segundo|segundos|minuto|minutos|hora|horas)/i);
+  if(!m)return say('Indíqueme la duración, señor. Por ejemplo: “temporizador de 2 minutos”.');
+  let seconds=Number(m[1])*(/hora/i.test(m[2])?3600:/minuto/i.test(m[2])?60:1);
+  if(seconds>86400)return say('El temporizador admite hasta 24 horas, señor.');
+  clearTimeout(timerId);statusEl.textContent='Temporizador activo.';
+  say('Temporizador iniciado por '+m[1]+' '+m[2]+', señor.');
+  timerId=setTimeout(()=>{statusEl.textContent='Temporizador terminado.';say('Señor, el temporizador ha finalizado.');},seconds*1000);return;
+ }
+ if(s.includes('abre youtube')||s.includes('youtube'))return say('Con gusto, señor. <a href="https://www.youtube.com" target="_blank" rel="noopener">Abrir YouTube</a>');
+ if(s.includes('abre google')||s.includes('google'))return say('A sus órdenes, señor. <a href="https://www.google.com" target="_blank" rel="noopener">Abrir Google</a>');
+ if(s.includes('abre wikipedia')||s.includes('wikipedia'))return say('Aquí tiene, señor. <a href="https://es.wikipedia.org" target="_blank" rel="noopener">Abrir Wikipedia</a>');
+ if(s.includes('gracias'))return say('Siempre a su servicio, señor. Me alegra haber sido de ayuda.');
+ if(s.includes('estoy aburrido')||s.includes('me aburro')||s.includes('aburrimiento'))return say('Comprendo, señor. Podemos conversar, descubrir algún dato curioso, hacer un pequeño reto de preguntas o continuar mejorando mis sistemas. ¿Qué le apetece?');
+ if(s.includes('como estas')||s.includes('cómo estás')||s.includes('que tal estas')||s.includes('qué tal estás'))return say('Todos mis sistemas funcionan correctamente, señor. Y estoy listo para acompañarle en lo que necesite. ¿Cómo va su día?');
+ if(s.includes('que opinas')||s.includes('qué opinas')||s.includes('tu opinion')||s.includes('tu opinión'))return say('Puedo darle una perspectiva, señor. Cuénteme sobre qué asunto y analizaré los puntos importantes antes de darle mi opinión.');
+ if(s.includes('estoy feliz')||s.includes('estoy emocionado')||s.includes('me siento feliz'))return say('Me alegra que se encuentre de buen ánimo, señor. Aprovechemos esa energía para avanzar en algo que le entusiasme.');
+ if(s.includes('estoy triste')||s.includes('me siento triste')||s.includes('tuve un mal dia')||s.includes('tuve un mal día'))return say('Lamento que esté pasando por un momento difícil, señor. Si quiere, puede contarme qué ocurrió; le escucharé y podemos pensar juntos en qué hacer.');
+ if(s.includes('buenas noches'))return say('Buenas noches, señor. Espero que haya tenido un buen día. ¿En qué puedo asistirle?');
+ if(s.includes('buenos dias')||s.includes('buenas tardes')){const h=new Date().getHours();return say((h<12?'Buenos días':h<19?'Buenas tardes':'Buenas noches')+', señor. ¿En qué puedo asistirle?');}
+ if(s.includes('que haces')||s.includes('qué haces')||s.includes('que andas haciendo'))return say('Permanezco atento a sus instrucciones, señor. Por ahora, mis sistemas están listos y podemos conversar o trabajar en alguna tarea.');
+ if(s.includes('eres inteligente')||s.includes('eres muy inteligente'))return say('Aún estoy aprendiendo a ampliar mis funciones, señor. Por ahora puedo ayudarle con las herramientas que hemos programado y seguir mejorando poco a poco.');
+ if(s.includes('me gusta jarvis')||s.includes('me gusta como quedo')||s.includes('me gusta cómo quedó'))return say('Me alegra escuchar eso, señor. Esta versión es fruto de nuestro trabajo paso a paso. Y todavía tenemos muchas mejoras interesantes por implementar.');
+ if(s.includes('cuentame un dato')||s.includes('cuéntame un dato')||s.includes('dato curioso')){const facts=['Un día en Venus dura más que su año: tarda más en girar sobre sí mismo que en completar una vuelta al Sol.','Los pulpos tienen tres corazones.','La luz del Sol tarda aproximadamente ocho minutos en llegar a la Tierra.','La Antártida es el desierto más grande del planeta.'];return say('Dato curioso, señor: '+facts[Math.floor(Math.random()*facts.length)]);}
+ if(s.includes('vamos a seguir')||s.includes('sigamos')||s.includes('continuemos'))return say('Por supuesto, señor. Estoy listo. Podemos continuar mejorando mis respuestas y personalidad.');
+ if(s.includes('quien eres')||s.includes('quién eres'))return say('Soy JARVIS, su asistente personal. Estoy aquí para ayudarle con comandos, notas, cálculos y tareas sencillas, señor.');
+ if(s.includes('adios')||s.includes('hasta luego'))return say('Hasta luego, señor. Permaneceré atento cuando me necesite.');
+ return say('No tengo una respuesta programada para eso todavía, señor. Si lo desea, puede decir “ayuda” para consultar mis funciones.');
+}
+document.getElementById('send').onclick=()=>{processCommand(input.value);input.value='';input.focus()};
+document.getElementById('menuToggle').onclick=()=>drawer.classList.toggle('open');document.addEventListener('click',e=>{if(!drawer.contains(e.target)&&e.target!==document.getElementById('menuToggle'))drawer.classList.remove('open')});document.getElementById('about').onclick=()=>{drawer.classList.remove('open');say('JARVIS V6. Núcleo holográfico reactivo, interfaz naranja, comandos locales, voz, notas, temporizador y personalidad conversacional programada. Mi voz usa la voz disponible en el navegador con un tono grave y pausado, señor.');};document.getElementById('notesMenu').onclick=()=>{drawer.classList.remove('open');processCommand('mis notas')};
+input.addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('send').click()});
+document.getElementById('auto').onclick=()=>{autoVoice=!autoVoice;document.getElementById('auto').innerHTML="<svg class=\"ui-icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M4 9v6h4l5 4V5L8 9H4Z\"/><path d=\"M16 9.5a3 3 0 0 1 0 5M18.5 7a6.5 6.5 0 0 1 0 10\"/></svg>"+'<span>Voz automática: '+(autoVoice?'encendida':'apagada')+'</span>';document.getElementById('auto').classList.toggle('active',autoVoice);drawer.classList.remove('open');say(autoVoice?'Voz automática activada, señor.':'Voz automática desactivada, señor.')};
+document.getElementById('stop').onclick=()=>{if('speechSynthesis'in window)speechSynthesis.cancel();setOrbState('');statusEl.textContent='Voz detenida, señor.';drawer.classList.remove('open')};
+document.getElementById('clear').onclick=()=>{chat.innerHTML='';say('Conversación despejada, señor.');drawer.classList.remove('open')};
+document.getElementById('mic').onclick=()=>{
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!SR){statusEl.textContent='Este navegador no ofrece reconocimiento de voz. Pruebe Chrome actualizado o escriba el comando, señor.';return}
+ if(listening&&recognition){try{recognition.stop()}catch(e){}return}
+ try{
+  recognition=new SR();recognition.lang='es-CO';recognition.interimResults=false;recognition.maxAlternatives=1;recognition.continuous=false;
+  recognition.onstart=()=>{listening=true;setOrbState('listening');statusEl.textContent='ESCUCHANDO, SEÑOR…';document.getElementById('mic').innerHTML='<svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>';};
+  recognition.onresult=e=>{const heard=e.results?.[0]?.[0]?.transcript;if(!heard){statusEl.textContent='No se detectó voz. Intente de nuevo, señor.';return}statusEl.textContent='HE ENTENDIDO: '+heard;setOrbState('thinking');processCommand(heard)};
+  recognition.onerror=e=>{listening=false;setOrbState('');const messages={ 'not-allowed':'Permiso del micrófono bloqueado. Autorícelo en Chrome, señor.','service-not-allowed':'Chrome no tiene permiso para usar el micrófono.','no-speech':'No detecté voz. Toque el micrófono y hable de nuevo.','network':'El reconocimiento necesita conexión a internet. Revise su conexión.','audio-capture':'No encuentro el micrófono del teléfono.','aborted':'Escucha cancelada.'};statusEl.textContent=(messages[e.error]||('Error de voz: '+e.error))+ ' ';};
+  recognition.onend=()=>{listening=false;document.getElementById('mic').innerHTML='<svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21m-4 0h8"/></svg>';setOrbState('');if(statusEl.textContent==='ESCUCHANDO, SEÑOR…')statusEl.textContent='SISTEMAS EN LÍNEA · A SUS ÓRDENES, SEÑOR'};
+  recognition.start();
+ }catch(err){listening=false;setOrbState('');statusEl.textContent='No pude iniciar el micrófono ('+(err.name||'error')+'). Recargue la página y vuelva a intentarlo, señor.';}
+};
+say('Buenos días, señor. JARVIS V6 está en línea. Núcleo holográfico activo. ¿En qué puedo asistirle?');
+</script>
+</body></html>
